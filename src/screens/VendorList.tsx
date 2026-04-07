@@ -11,19 +11,16 @@ import {
   SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
-import { getVendors, createVendor } from "../api/vendors";
+import { getVendors, createVendor } from '../api/vendors';
 const vendorTypes = ['Material', 'Service', 'Construction', 'Other'];
 import { get } from 'react-native/Libraries/NativeComponent/NativeComponentRegistry';
-
 const VendorList = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('Personal');
- 
-const [loading, setLoading] = useState(false);
-const [modalLoading, setModalLoading] = useState(false);
-  const [vendors, setVendors] = useState([]); // API se aane wala data yahan save hoga
 
-  // Form States (Web dashboard ke fields ke mutabiq) [cite: 1]
+  const [loading, setLoading] = useState(false);
+  const [modalLoading, setModalLoading] = useState(false);
+  const [vendors, setVendors] = useState([]);
   const [vendorNum, setVendorNum] = useState('');
   const [vendorName, setVendorName] = useState('');
   const [cnic, setCnic] = useState('');
@@ -32,14 +29,13 @@ const [modalLoading, setModalLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [vendorType, setVendorType] = useState('Material');
 
-  // 1. GET API: Vendors ki list mangwane ke liye
+  // 1. GET API: for registerd venders list
   const fetchVendors = async () => {
     setLoading(true);
     try {
-      // API HERE: Neeche wala URL apni API se badal dein
       const response = await getVendors();
       setVendors(response.data);
-         console.log('Fetched Vendors:', response.data);
+      console.log('Fetched Vendors:', response.data);
     } catch (error) {
       console.error('Fetch Error:', error);
     } finally {
@@ -51,58 +47,46 @@ const [modalLoading, setModalLoading] = useState(false);
     fetchVendors();
   }, []);
 
-  // 2. POST API: Naya Vendor save karne ke liye [cite: 1]
+  // 2. POST API: for new added vender
   const handleCreateVendor = async () => {
-    // const payload = {
-    //   vendor_number: vendorNum,
-    //   name: vendorName,
-    //   cnic: cnic,
-    //   address: address,
-    //   contact_person: contactPerson,
-    //   email: email,
-    //   type: vendorType,
-    // };
+    const payload = {
+      vendor_number: vendorNum,
+      name: vendorName,
+      contact_person_name: contactPerson,
+      vendor_type: vendorType,
+      cnic: cnic,
+      email: email || null,
+      address: address,
+      date_of_joining: new Date().toISOString().split('T')[0],
 
+      phoneNumbers: [
+        {
+          phone_number: '03001234567',
+        },
+      ],
 
-   const payload = {
-  vendor_number: vendorNum,
-  name: vendorName,
-  contact_person_name: contactPerson,   // ✅ FIXED
-  vendor_type: vendorType,              // Material | Service | Construction | Other
-  cnic: cnic,
-  email: email || null,                 // optional safe
-  address: address,
-  date_of_joining: new Date().toISOString().split('T')[0], // dynamic date
-
-  phoneNumbers: [
-    {
-      phone_number: "03001234567" // you can later make input field
-    }
-  ],
-
-  bankAccounts: [
-    {
-      account_number: "1234567890",
-      account_title: "Test Account",
-      iban: "PK12XXX",
-      bank_id: "1"
-    }
-  ]
-};
-    
+      bankAccounts: [
+        {
+          account_number: '1234567890',
+          account_title: 'Test Account',
+          iban: 'PK12XXX',
+          bank_id: '1',
+        },
+      ],
+    };
 
     try {
       setLoading(true);
       // API HERE: Naya vendor save karne ka endpoint yahan likhein
       // await createVendor(payload);
       // console.log('Vendor created:', response.data);
-
-const response = await createVendor(payload);
-console.log('Vendor created:', response.data);
-
+      const response = await createVendor(payload)
+      console.log('Vendor created:', response.data);
       alert('Vendor Created Successfully!');
       setModalVisible(false);
-      fetchVendors(); // List refresh karne ke liye
+
+      // fetchVendors(); // List refresh karne ke liye
+      setVendors(prev => [response.data, ...prev]);
     } catch (error) {
       console.error('Create error:', error);
       alert('Error saving vendor');
@@ -110,10 +94,9 @@ console.log('Vendor created:', response.data);
       setLoading(false);
     }
   };
-
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header [cite: 2] */}
+     
       <View style={styles.header}>
         <Text style={styles.headerTitle}>My Society: Vendors</Text>
         <TouchableOpacity
@@ -124,19 +107,16 @@ console.log('Vendor created:', response.data);
         </TouchableOpacity>
       </View>
 
-      {/* Search Bar [cite: 2] */}
+    //dearch bar
       <TextInput
         style={styles.searchBar}
         placeholder="Search by name, CNIC, or vendor number..."
-        placeholderTextColor='#999'
+        placeholderTextColor="#999"
       />
-
       {loading && <ActivityIndicator size="large" color="#1a1a2e" />}
-
-      {/* Vendors Table/List [cite: 2] */}
       <FlatList
         data={vendors}
-       keyExtractor={(item, index) => item.id?.toString() || index.toString()}
+        keyExtractor={(item, index) => item.id?.toString() || index.toString()}
         ListEmptyComponent={
           <Text style={styles.emptyText}>No vendors found</Text>
         }
@@ -147,8 +127,10 @@ console.log('Vendor created:', response.data);
               <Text style={styles.vType}>{item.type}</Text>
             </View>
             <Text style={styles.vName}>{item.name}</Text>
-         <Text style={styles.vType}>{item.vendor_type}</Text>
-<Text style={styles.vInfo}>Contact: {item.contact_person_name}</Text>
+            <Text style={styles.vType}>{item.vendor_type}</Text>
+            <Text style={styles.vInfo}>
+              Contact: {item.contact_person_name}
+            </Text>
           </View>
         )}
       />
@@ -158,7 +140,7 @@ console.log('Vendor created:', response.data);
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Add New Vendor</Text>
-            <TouchableOpacity onPress={() => setModalVisible(false)}>  
+            <TouchableOpacity onPress={() => setModalVisible(false)}>
               <Text style={{ color: 'red', fontWeight: 'bold' }}>CANCEL</Text>
             </TouchableOpacity>
           </View>
@@ -238,19 +220,22 @@ console.log('Vendor created:', response.data);
 
             {activeTab === 'Financial' && (
               <View>
-                <Text style={styles.label}>Vendor Type</Text> 
+                <Text style={styles.label}>Vendor Type</Text>
                 <TouchableOpacity
-                  style={styles.input} 
-                  onPress={() => setVendorType('Material')} 
-                > 
+                  style={styles.input}
+                  onPress={() => setVendorType('Material')}
+                >
                   <Text>{vendorType} (Click to change)</Text>
                 </TouchableOpacity>
               </View>
             )}
           </ScrollView>
 
-          <TouchableOpacity style={styles.saveBtn} 
-         onPress={() => setVendorType(vendorTypes[0])}>
+          <TouchableOpacity
+            style={styles.saveBtn}
+            //  onPress={() => setVendorType(vendorTypes[0])}>
+            onPress={handleCreateVendor}
+          >
             <Text style={styles.saveBtnText}>CREATE VENDOR</Text>
           </TouchableOpacity>
         </View>

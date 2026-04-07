@@ -8,7 +8,7 @@ import {
   ScrollView,
   Modal,
   SafeAreaView,
-} from 'react-native';
+} from 'react-native'; 
 import { getVendorInvoices, createVendorInvoice } from './services/invoicesServices';
 
 const Invoices = () => {

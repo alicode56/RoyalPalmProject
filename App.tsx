@@ -7,7 +7,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
 import Invoices from './src/Invoices';
-import BankCash from './src/BankCash';
+import BankListScreen from './src/Back Management/BankListScreen';
 import VendorList from './src/screens/VendorList';
 
 const Stack = createNativeStackNavigator();
@@ -22,7 +22,7 @@ const App = () => {
           <Stack.Screen name ='Dashboard' component={DashboardScreen}/>
           <Stack.Screen name ='VendorList' component={VendorList}/>
           <Stack.Screen name ='Invoices' component={Invoices}/>
-          <Stack.Screen name ='BankCash' component={BankCash}/>
+          <Stack.Screen name ='BankListScreen' component={BankListScreen}/>
 
           
         </Stack.Navigator>

@@ -193,6 +193,7 @@ import {
   ScrollView,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '../services/axious';
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
@@ -246,29 +247,23 @@ const LoginScreen = ({ navigation }) => {
   const handleLogin = async () => {
   // ... (validation code)
 
-  try {
-    const response = await fetch('http://192.168.1.25:3000/api/users/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: username, password: password }),
-    });
+ try {
+  const response = await api.post('/users/login', {
+    username: username,
+    password: password,
+  });
 
-    const data = await response.json();
+  const data = response.data;
 
-    if (response.ok) {
-      // YAHAN TOKEN SAVE HOGA
-      // data.token wo hai jo aapki screenshot mein line 4 par dikh raha hai
-      await AsyncStorage.setItem('userToken', data.token); 
-      
-      console.log('Token Saved:', data.token);
-      alert('Login successful!');
-      navigation.navigate('Dashboard');
-    } else {
-      alert(data.message || 'Invalid Credentials');
-    }
-  } catch (error) {
-    console.error('Error:', error);
-  }
+  await AsyncStorage.setItem('userToken', data.token);
+
+  console.log('Token Saved:', data.token);
+  alert('Login successful!');
+  navigation.navigate('Dashboard');
+
+} catch (error) {
+  console.log('Error:', error);
+}
 };
 
   return (

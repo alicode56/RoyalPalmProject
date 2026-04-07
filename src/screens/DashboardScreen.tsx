@@ -1,145 +1,3 @@
-// import React from 'react';
-// import {
-//   StyleSheet,
-//   Text,
-//   View,
-//   TouchableOpacity,
-//   ScrollView,
-//   SafeAreaView,
-// } from 'react-native';
-
-// const DashboardScreen = ({ navigation }) => {
-//   // Summary Data (Baad mein API se aayega)
-//   const stats = [
-//     { id: '1', title: 'Total Vendors', value: '0', color: '#4e73df' },
-//     { id: '2', title: 'Active Invoices', value: '0', color: '#1cc88a' },
-//     { id: '3', title: 'Pending Payments', value: 'PKR 0', color: '#f6c23e' },
-//   ];
-
-//   return (
-//     <SafeAreaView style={styles.container}>
-//       <View style={styles.header}>
-//         <Text style={styles.headerTitle}>Royal Palm Dashboard</Text>
-//         <Text style={styles.subTitle}>Welcome, Admin</Text>
-//       </View>
-
-//       <ScrollView contentContainerStyle={styles.content}>
-//         {/* Summary Stats Cards */}
-//         <View style={styles.statsGrid}>
-//           {stats.map(item => (
-//             <View
-//               key={item.id}
-//               style={[styles.statCard, { borderLeftColor: item.color }]}
-//             >
-//               <Text style={styles.statTitle}>{item.title}</Text>
-//               <Text style={styles.statValue}>{item.value}</Text>
-//             </View>
-//           ))}
-//         </View>
-
-//         {/* Quick Actions / Navigation */}
-//         <Text style={styles.sectionTitle}>Quick Management</Text>
-
-//         <TouchableOpacity
-//           style={styles.menuItem}
-//           onPress={() => navigation.navigate('VendorList')}
-//         >
-//           <View style={styles.iconPlaceholder} />
-//           <View>
-//             <Text style={styles.menuText}>Vendors Management</Text>
-//             <Text style={styles.menuSubText}>View and add new vendors</Text>
-//           </View>
-//         </TouchableOpacity>
-
-//         <TouchableOpacity
-//           style={styles.menuItem}
-//           onPress={() => navigation.navigate('Invoices')}
-//         >
-//           <View
-//             style={[styles.iconPlaceholder, { backgroundColor: '#1cc88a' }]}
-//           />
-//           <View>
-//             <Text style={styles.menuText}>Vendor Invoices</Text>
-//             <Text style={styles.menuSubText}>Manage bills and payments</Text>
-//           </View>
-//         </TouchableOpacity>
-
-//         <TouchableOpacity
-//           style={styles.menuItem}
-//           onPress={() => navigation.navigate('BankCash')}
-//         >
-//           <View
-//             style={[styles.iconPlaceholder, { backgroundColor: '#f6c23e' }]}
-//           />
-//           <View>
-//             <Text style={styles.menuText}>Bank & Cash</Text>
-//             <Text style={styles.menuSubText}>
-//               Check society accounts balance
-//             </Text>
-//           </View>
-//         </TouchableOpacity>
-//       </ScrollView>
-//     </SafeAreaView>
-//   );
-// };
-
-// export default DashboardScreen;
-
-// const styles = StyleSheet.create({
-//   container: { flex: 1, backgroundColor: '#f8f9fc' },
-//   header: {
-//     padding: 20,
-//     backgroundColor: '#1a1a2e',
-//     borderBottomLeftRadius: 20,
-//     borderBottomRightRadius: 20,
-//   },
-//   headerTitle: { color: 'white', fontSize: 22, fontWeight: 'bold' },
-//   subTitle: { color: '#ccc', fontSize: 14, marginTop: 5 },
-//   content: { padding: 20 },
-//   statsGrid: {
-//     flexDirection: 'row',
-//     flexWrap: 'wrap',
-//     justifyContent: 'space-between',
-//     marginBottom: 20,
-//   },
-//   statCard: {
-//     backgroundColor: 'white',
-//     width: '48%',
-//     padding: 15,
-//     borderRadius: 10,
-//     marginBottom: 15,
-//     elevation: 3,
-//     borderLeftWidth: 5,
-//   },
-//   statTitle: { fontSize: 12, color: '#555', fontWeight: '600' },
-//   statValue: { fontSize: 18, fontWeight: 'bold', color: '#333', marginTop: 5 },
-//   sectionTitle: {
-//     fontSize: 18,
-//     fontWeight: 'bold',
-//     color: '#333',
-//     marginBottom: 15,
-//     marginTop: 10,
-//   },
-//   menuItem: {
-//     flexDirection: 'row',
-//     backgroundColor: 'white',
-//     padding: 15,
-//     borderRadius: 12,
-//     alignItems: 'center',
-//     marginBottom: 12,
-//     elevation: 2,
-//   },
-//   iconPlaceholder: {
-//     width: 40,
-//     height: 40,
-//     backgroundColor: '#4e73df',
-//     borderRadius: 8,
-//     marginRight: 15,
-//   },
-//   menuText: { fontSize: 16, fontWeight: 'bold', color: '#333' },
-//   menuSubText: { fontSize: 12, color: '#777' },
-// });
-
 import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
@@ -153,58 +11,101 @@ import {
   Alert,
   Modal,
 } from 'react-native';
-import api from '../services/axious';  
+import api from '../services/axious';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 
 const DashboardScreen = ({ navigation }) => {
   // 1. SAARE HOOKS TOP PAR
-  const [vendors, setVendors] = useState([]);  
+  const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
-  const [submitting, setSubmitting] = useState(false); 
+  const [submitting, setSubmitting] = useState(false);
 
-  // Form State (DTO ke mutabiq) 
-  const [formData, setFormData] = useState({ 
-    vendor_number: '', 
+  const [formData, setFormData] = useState({
+    vendor_number: '',
     name: '',
     contact_person_name: '',
     vendor_type: 'Material',
     cnic: '',
     email: '',
     address: '',
-    date_of_joining: new Date().toISOString(), 
+    date_of_joining: new Date().toISOString(),
   });
-
   // 2. DATA FETCH FUNCTION
-  const fetchDashboardData = async () => {
-    try { 
+  useFocusEffect(
+    useCallback(() => {
+      fetchDashboardData();
+    }, []),
+  ); 
+const fetchDashboardData = async () => {
+  try {
+    const response = await api.get('/vendors');
 
+    if (response && response.data && Array.isArray(response.data)) {
+      setVendors(prev => {
+        // merge old + new (avoid losing newly added ones)
+        const combined = [...response.data];
 
-      const response = await api.get('/vendors');
-      if (response && response.data && Array.isArray(response.data)) {
-        setVendors(response.data);
-      } else {
-        setVendors([]);
-      }
-    } catch (error) {
-      console.log('Fetch Error:', error);
-      if (error.response?.status === 401) {
-        Alert.alert('Session Expired', 'Please login again.');
-        navigation.navigate('Login');
-      }
-    } finally {
-      setLoading(false);
+        prev.forEach(p => {
+          const exists = combined.find(c => c.id === p.id);
+          if (!exists) {
+            combined.push(p);
+          }
+        });
+
+        return combined;
+      });
+    } else {
+      setVendors(prev => prev); 
     }
-  };
+  } catch (error) {
+    console.log('Fetch Error:', error);
 
+    if (error.response?.status === 401) {
+      Alert.alert('Session Expired', 'Please login again.');
+      navigation.navigate('Login');
+    }
+  } finally {
+    setLoading(false);
+  }
+};
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
+  // const fetchDashboardData = async () => {
+    
+  //   // 
+  //   setLoading(true);
+  //   try {
+  //     const response = await api.get('/vendors');
+  //     if (response && response.data && Array.isArray(response.data)) {
+  //       setVendors(response.data);
+  //     } else {
+  //       setVendors([]);
+  //     }
+  //   } catch (error) {
+  //    console.log("GET vendors response:", response.data);
+  //     // console.log('Fetch Error:', error);
+  //     if (error.response?.status === 401) {
+  //       Alert.alert('Session Expired', 'Please login again.');
+  //       navigation.navigate('Login');
+  //     }
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   // 3. VENDOR SAVE FUNCTION
-  const handleAddVendor = async () => {
-  if (!formData.vendor_number || !formData.name || formData.cnic.length !== 13 || !formData.address) {
-    Alert.alert("Error", "Please fill required fields (CNIC must be 13 digits)");
+
+const handleAddVendor = async () => {
+  if (
+    !formData.vendor_number ||
+    !formData.name ||
+    formData.cnic.length !== 13 ||
+    !formData.address
+  ) {
+    Alert.alert(
+      'Error',
+      'Please fill required fields (CNIC must be 13 digits)',
+    );
     return;
   }
 
@@ -212,13 +113,11 @@ const DashboardScreen = ({ navigation }) => {
     setSubmitting(true);
 
     const response = await api.post('/vendors', formData);
-
-    // ✅ Instant UI update
-    setVendors(prev => [response.data, ...prev]);
-
-    Alert.alert("Success", "Vendor Added!");
+    if (response && response.data) {
+      setVendors(prev => [...prev, response.data]);
+    }
+ Alert.alert('Success', 'Vendor Added!');
     setModalVisible(false);
-
     // Reset form
     setFormData({
       vendor_number: '',
@@ -230,16 +129,67 @@ const DashboardScreen = ({ navigation }) => {
       address: '',
       date_of_joining: new Date().toISOString(),
     });
-    
   } catch (error) {
     const msg = error.response?.data?.message;
-    Alert.alert("Error", Array.isArray(msg) ? msg.join(", ") : msg || "Failed to add");
+    Alert.alert(
+      'Error',
+      Array.isArray(msg) ? msg.join(', ') : msg || 'Failed to add',
+    );
   } finally {
     setSubmitting(false);
   }
 };
 
-  // 4. STATS DATA (Hooks ke baad aur Loading se pehle)
+
+
+
+
+
+  // const handleAddVendor = async () => {
+  //   if (
+  //     !formData.vendor_number ||
+  //     !formData.name ||
+  //     formData.cnic.length !== 13 ||
+  //     !formData.address
+  //   ) {
+  //     Alert.alert(
+  //       'Error',
+  //       'Please fill required fields (CNIC must be 13 digits)',
+  //     );
+  //     return;
+  //   }
+
+  //   try {
+  //     setSubmitting(true);
+
+  //     const response = await api.post('/vendors', formData);
+      
+  //     // Refetch vendors to ensure we have the latest data from server
+  //     await fetchDashboardData();
+
+  //     Alert.alert('Success', 'Vendor Added!');
+  //     setModalVisible(false);
+  //     // Reset form
+  //     setFormData({
+  //       vendor_number: '',
+  //       name: '', 
+  //       contact_person_name: '',
+  //       vendor_type: 'Material',
+  //       cnic: '',
+  //       email: '',
+  //       address: '',
+  //       date_of_joining: new Date().toISOString(),
+  //     });
+  //   } catch (error) {
+  //     const msg = error.response?.data?.message;
+  //     Alert.alert(
+  //       'Error',
+  //       Array.isArray(msg) ? msg.join(', ') : msg || 'Failed to add',
+  //     );
+  //   } finally {
+  //     setSubmitting(false);
+  //   }
+  // };
   const stats = [
     {
       id: '1',
@@ -249,7 +199,6 @@ const DashboardScreen = ({ navigation }) => {
     },
     { id: '2', title: 'Active Status', value: 'Online', color: '#1cc88a' },
   ];
-
   // 5. LOADING SCREEN
   if (loading) {
     return (
@@ -259,8 +208,6 @@ const DashboardScreen = ({ navigation }) => {
       </View>
     );
   }
-
-  // 6. MAIN UI
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -268,7 +215,6 @@ const DashboardScreen = ({ navigation }) => {
         <Text style={styles.headerTitle}>Royal Palm Dashboard</Text>
         <Text style={styles.subTitle}>Welcome, Admin</Text>
       </View>
-
       <ScrollView contentContainerStyle={styles.content}>
         {/* Stats Grid */}
         <View style={styles.statsGrid}>
@@ -282,7 +228,6 @@ const DashboardScreen = ({ navigation }) => {
             </View>
           ))}
         </View>
-
         <Text style={styles.sectionTitle}>Quick Management</Text>
 
         {/* Add Vendor Button (Kholega Modal) */}
@@ -297,25 +242,28 @@ const DashboardScreen = ({ navigation }) => {
           </View>
         </TouchableOpacity>
 
-         <TouchableOpacity
+        <TouchableOpacity
           style={styles.menuItem}
-          onPress={() => navigation.navigate('BankCash')}
+          onPress={() => navigation.navigate('BankListScreen')}
         >
-          <View style={[styles.iconPlaceholder , { backgroundColor: '#f6c23e' }]} />
+          <View
+            style={[styles.iconPlaceholder, { backgroundColor: '#f6c23e' }]}
+          />
           <View>
             <Text style={styles.menuText}>Banks</Text>
-            <Text style={styles.menuSubText}>Add new financial institutions</Text>
+            <Text style={styles.menuSubText}>
+              Add new financial institutions
+            </Text>
           </View>
         </TouchableOpacity>
 
-
-
-
-         <TouchableOpacity
+        <TouchableOpacity
           style={styles.menuItem}
           onPress={() => navigation.navigate('Invoices')}
         >
-          <View style={[styles.iconPlaceholder , { backgroundColor: '#963b66' }]} />
+          <View
+            style={[styles.iconPlaceholder, { backgroundColor: '#963b66' }]}
+          />
           <View>
             <Text style={styles.menuText}>Invoices</Text>
             <Text style={styles.menuSubText}>Manage bills and payments</Text>
