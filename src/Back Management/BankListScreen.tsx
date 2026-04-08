@@ -12,9 +12,11 @@ import {
   StatusBar,
   Alert,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import api from '../services/axious';
 
 const BankListScreen = () => {
+  const navigation = useNavigation();
   const [isModalVisible, setModalVisible] = useState(false);
   const [banks, setBanks] = useState([]);
 
@@ -105,6 +107,18 @@ const BankListScreen = () => {
           <Text style={styles.addBtnText}>+ Add Bank</Text>
         </TouchableOpacity>
       </View>
+
+// hear2 business manangement btn 
+      <View style={styles.listContainer2}>
+        <TouchableOpacity style={styles.addBtnBusinessmanagment}
+          onPress={() => navigation.navigate('BusinessManagementScreen')}
+        >
+          <Text style={styles.listText2}>Business Management </Text>
+        </TouchableOpacity>
+      </View>
+
+
+      //
 
       {/* TOTAL */}
       <View style={styles.statsRow}>
@@ -198,13 +212,35 @@ export default BankListScreen;
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F0F3F7' },
 
+  listContainer2: {
+    flexDirection: 'row',
+    //padding: 20,
+    backgroundColor: '#fff',
+  },
+  listText2: {  
+    padding: 10,
+    borderRadius: 6, color: '#2b2727' },
+
+
+ addBtnBusinessmanagment: {
+    backgroundColor: '#cfc6c6a9',
+    padding: 8,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 180,
+    marginVertical: 5,
+    marginHorizontal: 10,
+  },
+
+
   topHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: 20,
     backgroundColor: '#fff',
   },
-
+ 
   headerTitle: { fontSize: 20, fontWeight: 'bold' },
 
   addBtnTop: {

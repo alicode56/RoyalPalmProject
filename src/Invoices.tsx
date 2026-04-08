@@ -14,10 +14,14 @@ import { getVendorInvoices, createVendorInvoice } from './services/invoicesServi
 const Invoices = () => {
   // 🔹 Dummy Data
   const [invoices, setInvoices] = useState([]);
+  // const [vendors] = useState([
+  //   { id: 1, name: 'ABC Traders' },
+  //   { id: 2, name: 'XYZ Suppliers' },
+  // ]);
+
   const [vendors] = useState([
-    { id: 1, name: 'ABC Traders' },
-    { id: 2, name: 'XYZ Suppliers' },
-  ]);
+  { id: 'ACTUAL_ID_FROM_DATABASE', name: 'ABC Traders' },
+]);
 
   const fetchInvoices = async () => {
     try {
@@ -30,6 +34,21 @@ const Invoices = () => {
   useEffect(() => {
     fetchInvoices();
   }, []);
+
+  const fetchVendors = async () => {
+  try {
+    // Replace with your actual service call
+    const res = await getVendors(); 
+    setVendors(res);
+  } catch (error) {
+    console.log('error fetching vendors', error);
+  }
+};
+
+useEffect(() => {
+  fetchInvoices();
+  fetchVendors(); // Fetch real IDs from the DB
+}, []);
 
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -135,10 +154,10 @@ const Invoices = () => {
             {/* Vendor */}
             <Text style={styles.label}>Vendor *</Text>
             {vendors.map(v => (
-              <TouchableOpacity
-                key={v.id}
-                style={[
-                  styles.vendorItem,
+              <TouchableOpacity 
+                key={v.id} 
+                style={[ 
+                  styles.vendorItem, 
                   formData.vendorId == v.id && { backgroundColor: '#dbeafe' },
                 ]}
                 onPress={() => setFormData({ ...formData, vendorId: v.id })}

@@ -9,6 +9,8 @@ import DashboardScreen from './src/screens/DashboardScreen';
 import Invoices from './src/Invoices';
 import BankListScreen from './src/Back Management/BankListScreen';
 import VendorList from './src/screens/VendorList';
+import BusinessManagementScreen from './src/Back Management/BusinessManagementScreen';
+import LoanManagementScreen from './src/Back Management/LoanManagementScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -19,12 +21,18 @@ const App = () => {
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name ='Dashboard' component={DashboardScreen}/>
-          <Stack.Screen name ='VendorList' component={VendorList}/>
-          <Stack.Screen name ='Invoices' component={Invoices}/>
-          <Stack.Screen name ='BankListScreen' component={BankListScreen}/>
-
-          
+          <Stack.Screen name="Dashboard" component={DashboardScreen} />
+          <Stack.Screen name="VendorList" component={VendorList} />
+          <Stack.Screen name="Invoices" component={Invoices} />
+          <Stack.Screen name="BankListScreen" component={BankListScreen} />
+          <Stack.Screen
+            name="BusinessManagementScreen"
+            component={BusinessManagementScreen}
+          />
+          <Stack.Screen
+            name="LoanManagementScreen"
+            component={LoanManagementScreen}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </View>
@@ -37,4 +45,3 @@ const styles = StyleSheet.create({
     backgroundColor: '#1a1a2e',
   },
 });
-
